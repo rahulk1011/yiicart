@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\BlameableBehavior;
+use yii\behaviors\TimestampBehavior;
 use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
 
@@ -38,6 +40,14 @@ class Product extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return '{{%products}}';
+    }
+
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class,
+            BlameableBehavior::class
+        ];
     }
 
     /**
@@ -132,14 +142,23 @@ class Product extends \yii\db\ActiveRecord
         if ($this->imageFile) {
             $this->image = '/products/'.Yii::$app->security->generateRandomString(32).'/'.$this->imageFile->name;
         }
-
+        $transaction = Yii::$app->db->beginTransaction();
         $ok = parent::save($runValidation, $attributeNames);
+
         if ($ok) {
             $fullPath = Yii::getAlias('@frontend/web/storage'.$this->image);
             $dir = dirname($fullPath);
-            FileHelper::createDirectory($dir);
-            $this->imageFile->saveAs($fullPath);
+            if(!FileHelper::createDirectory($dir) | !$this->imageFile->saveAs($fullPath)) {
+                $transaction->rollBack();
+                return false;
+            }
+            $transaction->commit();
         }
         return $ok;
+    }
+
+    public function getImageUrl()
+    {
+        return Yii::$app->params['frontendUrl'].'/storage'.$this->image;
     }
 }
