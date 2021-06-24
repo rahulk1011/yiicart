@@ -10,7 +10,7 @@ return [
             'class' => 'yii\caching\FileCache',
         ],
         'formatter' => [
-            'datetimeFormat' => ''
+            'datetimeFormat' => 'php:d/m/Y H:i'
         ],
     ],
 ];
