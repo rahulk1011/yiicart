@@ -293,7 +293,7 @@ AppAsset::register($this);
         <footer class="sticky-footer bg-white">
             <div class="container my-auto">
                 <div class="copyright text-center my-auto">
-                    <span>YIICART 2021 | @rahulk1011 &copy; </span>
+                    <span>YIICART-2021 | @rahulk1011 &copy; </span>
                 </div>
             </div>
         </footer>
